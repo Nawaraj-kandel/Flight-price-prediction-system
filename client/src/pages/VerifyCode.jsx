@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -30,7 +30,7 @@ const VerifyCode = () => {
                 alert("Invalid verification code or password reset failed.");
             }
         } catch (error) {
-            alert("An error occurred. Please try again.");
+            alert("An error occurred. Please try again."+ error);
         }
     };
 

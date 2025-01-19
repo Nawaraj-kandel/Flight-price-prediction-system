@@ -1,549 +1,523 @@
-// import React, { useState, useEffect } from "react";
-// import { useNavigate, useLocation, Link } from "react-router-dom";
-// import axios from "axios";
+// import { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer
+// import "react-toastify/dist/ReactToastify.css"; // Import Toastify styles
+// import Logout from "../pages/Logout";
 
 // const Login = () => {
-//     const [state, setState] = useState("Login");
-//     const [formData, setFormData] = useState({
-//         firstName: "",
-//         lastName: "",
-//         dob: "",
-//         phone: "",
-//         email: "",
-//         password: "",
-//         confirmPassword: "",
-//         verificationCode: "",
-//         newPassword: ""
-//     });
-//     const [agree, setAgree] = useState(false);
-//     const [errors, setErrors] = useState({});
-//     const [loading, setLoading] = useState(false);
-//     const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem("isAuthenticated") === "true");
-//     const [forgotPasswordStep, setForgotPasswordStep] = useState(0);
-//     const navigate = useNavigate();
-//     const location = useLocation();
+// 	const [state, setState] = useState("Login");
+// 	const [formData, setFormData] = useState({
+// 		username: "",
+// 		email: "",
+// 		password: "",
+// 	});
+// 	const [errors, setErrors] = useState({});
+// 	const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
 
-//     useEffect(() => {
-//         if (isAuthenticated && location.state?.fromViewPrice) {
-//             navigate("/viewprice");
-//         }
-//     }, [isAuthenticated, location, navigate]);
+// 	const navigate = useNavigate();
 
-//     const handleChange = (e) => {
-//         setFormData({ ...formData, [e.target.name]: e.target.value });
-//     };
+// 	// Update form data state on input change
+// 	const changeHandler = (e) => {
+// 		setFormData({ ...formData, [e.target.name]: e.target.value });
+// 		setErrors({ ...errors, [e.target.name]: "" });
+// 	};
 
-//     const validate = () => {
-//         let newErrors = {};
+// 	// Validate form data
+// 	const validateForm = () => {
+// 		const newErrors = {};
+// 		if (!formData.email) newErrors.email = "Email is required.";
+// 		if (!formData.password) {
+// 			newErrors.password = "Password is required.";
+// 		} else if (
+// 			state === "Sign Up" &&
+// 			!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(formData.password)
+// 		) {
+// 			newErrors.password =
+// 				"Password must be at least 8 characters, with an uppercase letter and a number.";
+// 		}
+// 		if (state === "Sign Up" && !formData.username) {
+// 			newErrors.username = "Username is required.";
+// 		}
+// 		setErrors(newErrors);
+// 		return Object.keys(newErrors).length === 0;
+// 	};
 
-//         if (state === "Sign Up") {
-//             if (!formData.firstName) newErrors.firstName = "First Name is required";
-//             if (!formData.lastName) newErrors.lastName = "Last Name is required";
-//             if (!formData.dob) newErrors.dob = "Date of Birth is required";
-//             if (!formData.phone) newErrors.phone = "Phone Number is required";
-//             if (formData.password !== formData.confirmPassword) {
-//                 newErrors.confirmPassword = "Passwords do not match";
-//             }
-//             if (!agree) newErrors.agree = "You must agree to the terms & privacy policy";
-//         }
+// 	// Handle login
 
-//         if (!formData.email.includes("@gmail.com")) {
-//             newErrors.email = "Email should contain @gmail.com";
-//         }
-//         if (!formData.password && forgotPasswordStep === 0) {
-//             newErrors.password = "Password is required";
-//         }
+// 	const login = async () => {
+// 		if (!validateForm()) return;
 
-//         setErrors(newErrors);
-//         return Object.keys(newErrors).length === 0;
-//     };
+// 		try {
+// 			const response = await fetch("/api/auth/login", {
+// 				method: "POST",
+// 				headers: { "Content-Type": "application/json" },
+// 				body: JSON.stringify({
+// 					email: formData.email,
+// 					password: formData.password,
+// 				}),
+// 			});
+// 			const data = await response.json();
+// 			if (response.ok) {
+// 				toast.success("Login Successful!");
+// 				const { token, expiresIn } = data;
+// 				localStorage.setItem(
+// 					"authToken",
+// 					JSON.stringify({ token, expiresAt: Date.now() + expiresIn * 1000 })
+// 				);
+// 				navigate("/");
+// 			} else {
+// 				toast.error(data.message || "Invalid email or password.");
+// 			}
+// 		} catch (error) {
+// 			toast.error("An error occurred. Please try again." + error);
+// 		}
+// 	};
 
-//     const signup = async () => {
-//         if (!validate()) return;
-//         setLoading(true);
 
-//         try {
-//             const response = await axios.post("http://localhost:5000/signup", {
-//                 firstName: formData.firstName,
-//                 lastName: formData.lastName,
-//                 dob: formData.dob,
-//                 phone: formData.phone,
-//                 email: formData.email,
-//                 password: formData.password
-//             });
 
-//             alert("Sign-up successful! You can now log in.");
-//             setState("Login");
-//         } catch (error) {
-//             alert("Sign-up failed. Please try again.");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
+// 	// Handle signup
+// 	const signup = async () => {
+// 		if (!validateForm()) return;
 
-//     const login = async () => {
-//         if (!validate()) return;
-//         setLoading(true);
+// 		try {
+// 			const response = await fetch("/api/auth/signup", {
+// 				method: "POST",
+// 				headers: { "Content-Type": "application/json" },
+// 				body: JSON.stringify({
+// 					username: formData.username,
+// 					email: formData.email,
+// 					password: formData.password,
+// 				}),
+// 			});
+// 			const data = await response.json();
+// 			if (response.ok) {
+// 				toast.success("Signup Successful! Please log in.");
+// 				setState("Login");
+// 				setFormData({ username: "", email: "", password: "" });
+// 			} else {
+// 				toast.error(data.message || "Signup failed. Please try again.");
+// 			}
+// 		} catch (error) {
+// 			toast.error("An error occurred. Please try again." + error);
+// 		}
+// 	};
 
-//         try {
-//             const response = await axios.get("http://localhost:5000/login", {
-//                 params: {
-//                     email: formData.email,
-//                     password: formData.password
-//                 }
-//             });
+// 	// Route guarding
+// 	useEffect(() => {
+// 		const auth = localStorage.getItem("authToken");
+// 		if (auth) {
+// 			const { expiresAt } = JSON.parse(auth);
+// 			if (Date.now() >= expiresAt) {
+// 				Logout();
+// 			}
+// 		} else if (state === "Login") {
+// 			navigate("/login");
+// 		}
+// 	}, [navigate, state]);
 
-//             if (response.data.success) {
-//                 alert("Login successful!");
-//                 localStorage.setItem("isAuthenticated", true);
-//                 setIsAuthenticated(true);
-//                 navigate(location.state?.fromViewPrice ? "/viewprice" : "/");
-//             } else {
-//                 alert("Login failed. Invalid email or password.");
-//             }
-//         } catch (error) {
-//             alert("Login failed. Please try again.");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
+// 	return (
+// 		<div className="w-full h-screen bg-blue-100 flex items-center justify-center">
+// 			<div className="w-11/12 md:w-1/3 bg-white p-8 rounded-lg shadow-md">
+// 				<h1 className="text-2xl font-semibold mb-6 text-center">{state}</h1>
 
-//     const logout = () => {
-//         localStorage.removeItem("isAuthenticated");
-//         setIsAuthenticated(false);
-//         navigate("/login");
-//     };
+// 				{/* Input Fields */}
+// 				<div className="flex flex-col space-y-4">
+// 					{state === "Sign Up" && (
+// 						<div>
+// 							<input
+// 								type="text"
+// 								name="username"
+// 								value={formData.username}
+// 								onChange={changeHandler}
+// 								placeholder="Username"
+// 								className={`border p-3 rounded-md w-full ${errors.username ? "border-red-500" : "border-gray-300"
+// 									}`}
+// 							/>
+// 							{errors.username && (
+// 								<p className="text-red-500 text-sm mt-1">
+// 									{errors.username}
+// 								</p>
+// 							)}
+// 						</div>
+// 					)}
 
-//     const requestPasswordReset = async () => {
-//         try {
-//             const response = await axios.post("http://localhost:5000/request-reset", {
-//                 email: formData.email
-//             });
-//             if (response.data.success) {
-//                 alert("Verification code sent to your email!");
-//                 setForgotPasswordStep(2);
-//             } else {
-//                 alert("Failed to send code. Please try again.");
-//             }
-//         } catch (error) {
-//             alert("Error sending code. Please try again.");
-//         }
-//     };
+// 					<div>
+// 						<input
+// 							type="email"
+// 							name="email"
+// 							value={formData.email}
+// 							onChange={changeHandler}
+// 							placeholder="Email Address"
+// 							className={`border p-3 rounded-md w-full ${errors.email ? "border-red-500" : "border-gray-300"
+// 								}`}
+// 						/>
+// 						{errors.email && (
+// 							<p className="text-red-500 text-sm mt-1">{errors.email}</p>
+// 						)}
+// 					</div>
 
-//     const verifyAndResetPassword = async () => {
-//         try {
-//             const response = await axios.post("http://localhost:5000/reset-password", {
-//                 email: formData.email,
-//                 verificationCode: formData.verificationCode,
-//                 newPassword: formData.newPassword
-//             });
-//             if (response.data.success) {
-//                 alert("Password reset successful! You can now log in.");
-//                 setForgotPasswordStep(0);
-//                 setState("Login");
-//             } else {
-//                 alert("Invalid code or failed to reset password.");
-//             }
-//         } catch (error) {
-//             alert("Error resetting password. Please try again.");
-//         }
-//     };
+// 					<div className="relative">
+// 						<input
+// 							type={showPassword ? "text" : "password"}
+// 							name="password"
+// 							value={formData.password}
+// 							onChange={changeHandler}
+// 							placeholder="Password"
+// 							className={`border p-3 rounded-md w-full ${errors.password ? "border-red-500" : "border-gray-300"
+// 								}`}
+// 						/>
+// 						<button
+// 							type="button"
+// 							className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+// 							onClick={() => setShowPassword(!showPassword)}
+// 						>
+// 							{showPassword ? "Hide" : "Show"}
+// 						</button>
+// 						{errors.password && (
+// 							<p className="text-red-500 text-sm mt-1">{errors.password}</p>
+// 						)}
+// 					</div>
+// 				</div>
 
-//     return (
-//         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-//             <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-//                 <h1 className="text-2xl font-semibold text-center text-gray-700 mb-6">{isAuthenticated ? "Account" : state}</h1>
-                
-//                 {isAuthenticated ? (
-//                     <div className="text-center">
-//                         <p className="text-gray-700 mb-4">You are logged in.</p>
-//                         <button
-//                             onClick={logout}
-//                             className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-//                         >
-//                             Logout
-//                         </button>
-//                     </div>
-//                 ) : (
-//                     <div className="space-y-4">
-//                         {state === "Sign Up" && (
-//                             <>
-//                                 <div className="flex space-x-4">
-//                                     <input
-//                                         name="firstName"
-//                                         value={formData.firstName}
-//                                         onChange={handleChange}
-//                                         type="text"
-//                                         placeholder="First Name"
-//                                         className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                     />
-//                                     <input
-//                                         name="lastName"
-//                                         value={formData.lastName}
-//                                         onChange={handleChange}
-//                                         type="text"
-//                                         placeholder="Last Name"
-//                                         className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                     />
-//                                 </div>
-//                                 {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
-//                                 {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
+// 				{/* Submit Button */}
+// 				<button
+// 					onClick={state === "Login" ? login : signup}
+// 					className="w-full bg-blue-500 text-white p-3 rounded-md mt-6 hover:bg-blue-600"
+// 				>
+// 					{state === "Login" ? "Log In" : "Sign Up"}
+// 				</button>
 
-//                                 <input
-//                                     name="dob"
-//                                     value={formData.dob}
-//                                     onChange={handleChange}
-//                                     type="date"
-//                                     placeholder="Date of Birth"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
+// 				{/* Toggle between Login and Sign Up */}
+// 				<p className="text-center text-gray-600 mt-4">
+// 					{state === "Login" ? (
+// 						<>
+// 							Do not have an account?{" "}
+// 							<span
+// 								onClick={() => setState("Sign Up")}
+// 								className="text-blue-500 cursor-pointer"
+// 							>
+// 								Sign Up
+// 							</span>
+// 						</>
+// 					) : (
+// 						<>
+// 							Already have an account?{" "}
+// 							<span
+// 								onClick={() => setState("Login")}
+// 								className="text-blue-500 cursor-pointer"
+// 							>
+// 								Log In
+// 							</span>
+// 						</>
+// 					)}
+// 				</p>
 
-//                                 <input
-//                                     name="phone"
-//                                     value={formData.phone}
-//                                     onChange={handleChange}
-//                                     type="tel"
-//                                     placeholder="Phone Number"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-//                             </>
-//                         )}
-
-//                         {forgotPasswordStep === 0 && (
-//                             <>
-//                                 <input
-//                                     name="email"
-//                                     value={formData.email}
-//                                     onChange={handleChange}
-//                                     type="email"
-//                                     placeholder="Email Address"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-//                                 <input
-//                                     name="password"
-//                                     value={formData.password}
-//                                     onChange={handleChange}
-//                                     type="password"
-//                                     placeholder="Password"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-
-//                                 <p className="text-blue-600 cursor-pointer text-sm text-right" onClick={() => setForgotPasswordStep(1)}>
-//                                     Forgot Password?
-//                                 </p>
-//                             </>
-//                         )}
-
-//                         {forgotPasswordStep === 1 && (
-//                             <>
-//                                 <input
-//                                     name="email"
-//                                     value={formData.email}
-//                                     onChange={handleChange}
-//                                     type="email"
-//                                     placeholder="Enter your email"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 <button onClick={requestPasswordReset} className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-//                                     Send Verification Code
-//                                 </button>
-//                             </>
-//                         )}
-
-//                         {forgotPasswordStep === 2 && (
-//                             <>
-//                                 <input
-//                                     name="verificationCode"
-//                                     value={formData.verificationCode}
-//                                     onChange={handleChange}
-//                                     type="text"
-//                                     placeholder="Verification Code"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 <input
-//                                     name="newPassword"
-//                                     value={formData.newPassword}
-//                                     onChange={handleChange}
-//                                     type="password"
-//                                     placeholder="New Password"
-//                                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 />
-//                                 <button onClick={verifyAndResetPassword} className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-//                                     Reset Password
-//                                 </button>
-//                             </>
-//                         )}
-
-//                         {state === "Sign Up" && (
-//                             <div className="flex items-center space-x-2">
-//                                 <input
-//                                     type="checkbox"
-//                                     checked={agree}
-//                                     onChange={() => setAgree(!agree)}
-//                                     className="h-4 w-4 text-blue-600"
-//                                 />
-//                                 <label className="text-gray-600">I agree to the terms & privacy policy</label>
-//                             </div>
-//                         )}
-
-//                         <button
-//                             onClick={state === "Login" ? login : signup}
-//                             className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-//                         >
-//                             {loading ? "Loading..." : state}
-//                         </button>
-
-//                         <p className="text-gray-600 text-center mt-4">
-//                             {state === "Login" ? "Don't have an account?" : "Already have an account?"}
-//                             <span
-//                                 className="text-blue-600 cursor-pointer ml-2"
-//                                 onClick={() => setState(state === "Login" ? "Sign Up" : "Login")}
-//                             >
-//                                 {state === "Login" ? "Sign Up" : "Login"}
-//                             </span>
-//                         </p>
-//                     </div>
-//                 )}
-//             </div>
-//         </div>
-//     );
+// 				{/* Terms and Conditions */}
+// 				{state === "Sign Up" && (
+// 					<div className="flex items-center mt-4">
+// 						<input type="checkbox" name="agree" id="agree" className="mr-2" />
+// 						<p className="text-gray-600 text-sm">
+// 							By continuing, I agree to the{" "}
+// 							<span className="text-blue-500 cursor-pointer">terms</span> &{" "}
+// 							<span className="text-blue-500 cursor-pointer">
+// 								privacy policy
+// 							</span>
+// 							.
+// 						</p>
+// 					</div>
+// 				)}
+// 			</div>
+// 			<ToastContainer />
+// 		</div>
+// 	);
 // };
 
 // export default Login;
 
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+
+import { useState,  } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const Login = () => {
-    const [state, setState] = useState("Login");
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        dob: "",
-        phone: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-    });
-    const [agree, setAgree] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem("isAuthenticated") === "true");
-    const navigate = useNavigate();
-    const location = useLocation();
+  
+  const [state, setState] = useState("Login"); // State to toggle between Login and Sign Up
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false); 
+  const [loading, setLoading] = useState(false); 
 
-    useEffect(() => {
-        if (isAuthenticated && location.state?.fromViewPrice) {
-            navigate("/viewprice");
-        }
-    }, [isAuthenticated, location, navigate]);
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Handle input changes
+  const changeHandler = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  // Validate form data
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) newErrors.email = "Email is required.";
+    if (!formData.password) {
+      newErrors.password = "Password is required.";
+    } else if (
+      state === "Sign Up" &&
+      !/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(formData.password)
+    ) {
+      newErrors.password =
+        "Password must be at least 8 characters, with an uppercase letter and a number.";
+    }
+    if (state === "Sign Up" && !formData.username) {
+      newErrors.username = "Username is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle login
+  const login = async () => {
+    if (!validateForm()) return;
+    setLoading(true);
+    try {
+    //  Commented out the API call for testing purposes
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Login Successful!");
+        const { token, expiresIn } = data;
+        localStorage.setItem(
+          "authToken",
+          JSON.stringify({ token, expiresAt: Date.now() + expiresIn * 1000 })
+        );
+        console.log("Redirecting to /price...");
+        navigate("/");
+      } else {
+       console.log("Login failed");
+        toast.error(data.message || "Invalid email or password.");
+      }
+
+      // Bypass login for testing purposes
+      // const defaultEmail = "test@example.com";
+      // const defaultPassword = "Password123";
+      // if (formData.email === defaultEmail && formData.password === defaultPassword) {
+      //   toast.success("Login Successful!");
+      //   localStorage.setItem(
+      //     "authToken",
+      //     JSON.stringify({ token: "dummyToken", expiresAt: Date.now() + 3600 * 1000 })
+      //   );
+      //   console.log("Redirecting to /price...");
+      //   navigate("/price");
+      // } else {
+      //   console.log("Login failed");
+      //   toast.error("Invalid email or password.");
+      // }
+    } catch (error) {
+      toast.error("An error occurred. Please try again." + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  /* const login = async () => {
+  if (!validateForm()) return;
+
+  setLoading(true);
+  try {
+    const mockResponse = {
+      token: "mock-token",
+      expiresIn: 3600,
     };
 
-    const validate = () => {
-        let newErrors = {};
+    // Simulate delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        if (state === "Sign Up") {
-            if (!formData.firstName) newErrors.firstName = "First Name is required";
-            if (!formData.lastName) newErrors.lastName = "Last Name is required";
-            if (!formData.dob) newErrors.dob = "Date of Birth is required";
-            if (!formData.phone) newErrors.phone = "Phone Number is required";
-            if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = "Passwords do not match";
-            }
-            if (!agree) newErrors.agree = "You must agree to the terms & privacy policy";
-        }
-
-        if (!formData.email.includes("@") || !formData.email.includes(".com")) {
-            newErrors.email = "A valid email is required.";
-        }
-        
-        if (!formData.password) {
-            newErrors.password = "Password is required";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const signup = async () => {
-        if (!validate()) return;
-        setLoading(true);
-
-        try {
-            await axios.post("http://localhost:5000/signup", {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                dob: formData.dob,
-                phone: formData.phone,
-                email: formData.email,
-                password: formData.password,
-            });
-
-            alert("Sign-up successful! You can now log in.");
-            setState("Login");
-        } catch (error) {
-            alert("Sign-up failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const login = async () => {
-        if (!validate()) return;
-        setLoading(true);
-
-        try {
-            const response = await axios.get("http://localhost:5000/login", {
-                params: {
-                    email: formData.email,
-                    password: formData.password,
-                },
-            });
-
-            if (response.data.success) {
-                alert("Login successful!");
-                localStorage.setItem("isAuthenticated", true);
-                setIsAuthenticated(true);
-                navigate(location.state?.fromViewPrice ? "/viewprice" : "/");
-            } else {
-                alert("Login failed. Invalid email or password.");
-            }
-        } catch (error) {
-            alert("Login failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const logout = () => {
-        localStorage.removeItem("isAuthenticated");
-        setIsAuthenticated(false);
-        navigate("/login");
-    };
-
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
-                <h1 className="text-2xl font-semibold text-center text-gray-700 mb-6">
-                    {isAuthenticated ? "Account" : state}
-                </h1>
-
-                {isAuthenticated ? (
-                    <div className="text-center">
-                        <p className="text-gray-700 mb-4">You are logged in.</p>
-                        <button
-                            onClick={logout}
-                            className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {state === "Sign Up" && (
-                            <>
-                                <div className="flex space-x-4">
-                                    <input
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="First Name"
-                                        className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                    <input
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Last Name"
-                                        className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                </div>
-                                {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
-                                {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
-
-                                <input
-                                    name="dob"
-                                    value={formData.dob}
-                                    onChange={handleChange}
-                                    type="date"
-                                    placeholder="Date of Birth"
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
-
-                                <input
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    type="tel"
-                                    placeholder="Phone Number"
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-                            </>
-                        )}
-
-                        <input
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            type="email"
-                            placeholder="Email Address"
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-                        <input
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            type="password"
-                            placeholder="Password"
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-
-                        <button
-                            onClick={state === "Login" ? login : signup}
-                            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                        >
-                            {loading ? "Loading..." : state}
-                        </button>
-
-                        <p className="text-gray-600 text-center mt-4">
-                            {state === "Login" ? "Don't have an account?" : "Already have an account?"}
-                            <span
-                                className="text-blue-600 cursor-pointer ml-2"
-                                onClick={() => setState(state === "Login" ? "Sign Up" : "Login")}
-                            >
-                                {state === "Login" ? "Sign Up" : "Login"}
-                            </span>
-                        </p>
-
-                        {state === "Login" && (
-                            <p
-                                className="text-blue-600 cursor-pointer text-sm text-center mt-2"
-                                onClick={() => navigate("/ForgotPassword")}
-                            >
-                                Forgot Password?
-                            </p>
-                        )}
-                    </div>
-                )}
-            </div>
-        </div>
+    // Simulate successful response
+    localStorage.setItem(
+      "authToken",
+      JSON.stringify({ token: mockResponse.token, expiresAt: Date.now() + mockResponse.expiresIn * 1000 })
     );
+    toast.success("Login Successful!");
+    navigate("/");
+  } catch (error) {
+    toast.error("An error occurred. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+ */
+
+  // Handle signup
+  const signup = async () => {
+    if (!validateForm()) return;
+    setLoading(true);
+    try {
+    //  Commented out the API call for testing purposes
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Signup Successful! Please log in.");
+        setState("Login");
+        setFormData({ username: "", email: "", password: "" });
+      } else {
+        toast.error(data.message || "Signup failed. Please try again.");
+      }
+
+      // Bypass signup for testing purposes
+      // toast.success("Signup Successful! Please log in.");
+      // setState("Login");
+      // setFormData({ username: "", email: "", password: "" });
+    } catch (error) {
+      toast.error("An error occurred. Please try again." + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission
+      login();
+    }
+  };
+  return (
+    <div className="w-full h-screen bg-blue-100 flex items-center justify-center">
+      <div className="w-11/12 md:w-1/3 bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-semibold mb-6 text-center">{state}</h1>
+
+        {/* Input Fields */}
+        <div className="flex flex-col space-y-4">
+          {state === "Sign Up" && (
+            <div>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={changeHandler}
+                onKeyDown={handleKeyDown}
+                placeholder="Username"
+                className={`border p-3 rounded-md w-full ${
+                  errors.username ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+              )}
+            </div>
+          )}
+
+          <div>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={changeHandler}
+              onKeyDown={handleKeyDown}
+              placeholder="Email Address"
+              className={`border p-3 rounded-md w-full ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={changeHandler}
+              onKeyDown={handleKeyDown}
+              placeholder="Password"
+              className={`border p-3 rounded-md w-full ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={state === "Login" ? login : signup}
+          className="w-full bg-blue-500 text-white p-3 rounded-md mt-6 hover:bg-blue-600"
+          disabled={loading}
+        >
+          {loading ? "Processing..." : state === "Login" ? "Log In" : "Sign Up"}
+        </button>
+
+        {/* Toggle between Login and Sign Up */}
+        <p className="text-center text-gray-600 mt-4">
+          {state === "Login" ? (
+            <>
+              Do not have an account?{" "}
+              <span
+                onClick={() => setState("Sign Up")}
+                className="text-blue-500 cursor-pointer"
+              >
+                Sign Up
+              </span>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <span
+                onClick={() => setState("Login")}
+                className="text-blue-500 cursor-pointer"
+              >
+                Log In
+              </span>
+            </>
+          )}
+        </p>
+
+        {/* Terms and Conditions */}
+        {state === "Sign Up" && (
+          <div className="flex items-center mt-4">
+            <input type="checkbox" name="agree" id="agree" className="mr-2" />
+            <p className="text-gray-600 text-sm">
+              By continuing, I agree to the{" "}
+              <span className=" text-blue-500 cursor-pointer"> <a href="/terms"> terms & privacy policy </a></span> 
+              
+            </p>
+          </div>
+        )}
+      </div>
+      <ToastContainer />
+    </div>
+  );
 };
 
 export default Login;

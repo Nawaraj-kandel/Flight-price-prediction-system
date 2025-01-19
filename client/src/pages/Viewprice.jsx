@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Viewprice = () => {
@@ -19,9 +19,9 @@ const Viewprice = () => {
 
   // Effect hook to check if the user is authenticated, otherwise redirect to login
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
-    if (!isAuthenticated) {
-      navigate("/login", { state: { fromViewPrice: true } });
+    const auth = localStorage.getItem("authToken");
+    if (!auth) {
+      navigate("/login"); // Redirect to login if not authenticated
     }
   }, [navigate]);
 
@@ -52,7 +52,7 @@ const Viewprice = () => {
         setPredictedPrice(null);
       }
     } catch (error) {
-      setError("Failed to connect to server. Please check your connection.");
+      setError("Failed to connect to server. Please check your connection."+error);
       setPredictedPrice(null);
     }
   };
@@ -179,4 +179,3 @@ const Viewprice = () => {
 };
 
 export default Viewprice;
-
