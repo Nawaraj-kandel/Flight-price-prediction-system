@@ -239,13 +239,14 @@ import { useState,  } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { API_BASE_URL } from "../Api/Api";
 
 
 const Login = () => {
   
   const [state, setState] = useState("Login"); // State to toggle between Login and Sign Up
   const [formData, setFormData] = useState({
-    username: "",
+    // username: "",
     email: "",
     password: "",
   });
@@ -266,18 +267,22 @@ const Login = () => {
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required.";
     if (!formData.password) {
-      newErrors.password = "Password is required.";
-    } else if (
-      state === "Sign Up" &&
-      !/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(formData.password)
-    ) {
-      newErrors.password =
-        "Password must be at least 8 characters, with an uppercase letter and a number.";
+      newErrors.password = "Password is required."; // Retain only this if required field validation is necessary.
     }
-    if (state === "Sign Up" && !formData.username) {
-      newErrors.username = "Username is required.";
-    }
-    setErrors(newErrors);
+    
+    // if (!formData.password) {
+    //   newErrors.password = "Password is required.";
+    // } else if (
+    //   state === "Sign Up" &&
+    //   !/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(formData.password)
+    // ) {
+    //   newErrors.password =
+    //     "Password must be at least 8 characters, with an uppercase letter and a number.";
+    // }
+    // if (state === "Sign Up" && !formData.username) {
+    //   newErrors.username = "Username is required.";
+    // }
+    // setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -287,8 +292,9 @@ const Login = () => {
     setLoading(true);
     try {
     //  Commented out the API call for testing purposes
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
+        mode:"no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
@@ -365,11 +371,12 @@ const Login = () => {
     setLoading(true);
     try {
     //  Commented out the API call for testing purposes
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
+        mode:"no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: formData.username,
+          // username: formData.username,
           email: formData.email,
           password: formData.password,
         }),
@@ -378,7 +385,7 @@ const Login = () => {
       if (response.ok) {
         toast.success("Signup Successful! Please log in.");
         setState("Login");
-        setFormData({ username: "", email: "", password: "" });
+        setFormData({/* username: "",*/ email: "", password: "" });
       } else {
         toast.error(data.message || "Signup failed. Please try again.");
       }
@@ -408,7 +415,7 @@ const Login = () => {
 
         {/* Input Fields */}
         <div className="flex flex-col space-y-4">
-          {state === "Sign Up" && (
+          {/* {state === "Sign Up" && (
             <div>
               <input
                 type="text"
@@ -425,7 +432,7 @@ const Login = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.username}</p>
               )}
             </div>
-          )}
+          )} */}
 
           <div>
             <input
@@ -504,7 +511,7 @@ const Login = () => {
         </p>
 
         {/* Terms and Conditions */}
-        {state === "Sign Up" && (
+        {/* {state === "Sign Up" && (
           <div className="flex items-center mt-4">
             <input type="checkbox" name="agree" id="agree" className="mr-2" />
             <p className="text-gray-600 text-sm">
@@ -513,7 +520,7 @@ const Login = () => {
               
             </p>
           </div>
-        )}
+        )} */}
       </div>
       <ToastContainer />
     </div>
