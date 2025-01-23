@@ -235,7 +235,7 @@
 // export default Login;
 
 
-import { useState,  } from "react";
+import { useState, } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -243,7 +243,7 @@ import { API_BASE_URL } from "../Api/Api";
 
 
 const Login = () => {
-  
+
   const [state, setState] = useState("Login"); // State to toggle between Login and Sign Up
   const [formData, setFormData] = useState({
     // username: "",
@@ -251,8 +251,8 @@ const Login = () => {
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false); 
-  const [loading, setLoading] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -269,7 +269,7 @@ const Login = () => {
     if (!formData.password) {
       newErrors.password = "Password is required."; // Retain only this if required field validation is necessary.
     }
-    
+
     // if (!formData.password) {
     //   newErrors.password = "Password is required.";
     // } else if (
@@ -291,10 +291,10 @@ const Login = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-    //  Commented out the API call for testing purposes
+      //  Commented out the API call for testing purposes
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
-        mode:"no-cors",
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
@@ -312,7 +312,7 @@ const Login = () => {
         console.log("Redirecting to /price...");
         navigate("/");
       } else {
-       console.log("Login failed");
+        console.log("Login failed");
         toast.error(data.message || "Invalid email or password.");
       }
 
@@ -370,10 +370,10 @@ const Login = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-    //  Commented out the API call for testing purposes
+      //  Commented out the API call for testing purposes
       const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
-        mode:"no-cors",
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           // username: formData.username,
@@ -401,7 +401,7 @@ const Login = () => {
     }
   };
 
-  
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Prevent form submission
@@ -442,9 +442,8 @@ const Login = () => {
               onChange={changeHandler}
               onKeyDown={handleKeyDown}
               placeholder="Email Address"
-              className={`border p-3 rounded-md w-full ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`border p-3 rounded-md w-full ${errors.email ? "border-red-500" : "border-gray-300"
+                }`}
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -459,9 +458,8 @@ const Login = () => {
               onChange={changeHandler}
               onKeyDown={handleKeyDown}
               placeholder="Password"
-              className={`border p-3 rounded-md w-full ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
+              className={`border p-3 rounded-md w-full ${errors.password ? "border-red-500" : "border-gray-300"
+                }`}
             />
             <button
               type="button"
@@ -491,7 +489,12 @@ const Login = () => {
             <>
               Do not have an account?{" "}
               <span
-                onClick={() => setState("Sign Up")}
+                onClick={() => {
+                  setState("Sign Up");
+                  setFormData({ email: "", password: "" }); // Clear form data
+                  setErrors({}); // Clear errors
+                }}
+
                 className="text-blue-500 cursor-pointer"
               >
                 Sign Up
@@ -501,7 +504,11 @@ const Login = () => {
             <>
               Already have an account?{" "}
               <span
-                onClick={() => setState("Login")}
+                onClick={() => {
+                  setState("Login");
+                  setFormData({ email: "", password: "" }); // Clear form data
+                  setErrors({}); // Clear errors
+                }}
                 className="text-blue-500 cursor-pointer"
               >
                 Log In
