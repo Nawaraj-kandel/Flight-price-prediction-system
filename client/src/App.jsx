@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css"; // Ensure Toastify styles are im
 import PricePrediction from "./pages/PricePrediction";
 import Booking from "./pages/Booking";
 import Terms from "./components/Terms";
+import Signup from "./pages/Signup";
 // import PrivateRoute from "./components/PrivateRoute";
 
 
@@ -26,6 +27,8 @@ function App() {
           <Route path="/price" element={<PricePrediction />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+
           {/* <Route path="/price" element={  <PrivateRoute> <PricePrediction /> </PrivateRoute> } /> */}
        
           <Route path="/booking" element={<Booking />} />

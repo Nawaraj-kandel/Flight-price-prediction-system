@@ -91,11 +91,11 @@ const PricePrediction = () => {
   };
 
   const origin = ["Banglore", "Delhi", "Kolkata", "Mumbai", "Chennai"];
-  const destination = ["Banglore", "Cochin", "Delhi", "New Delhi", "Kolkata", "Hydrabad"];
+  const destination = ["Banglore", "Cochin", "Delhi", "New Delhi", "Hydrabad", "Kolkata"];
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
-      <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-lg mt-10">
         <form onSubmit={handleSubmit}>
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
             Predict Flight Prices
@@ -257,17 +257,20 @@ const PricePrediction = () => {
 
       {/* No Predictions Message */}
       {!loading && predictions.length === 0 && (
-        <div className="mt-8 bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
-          {errors.apiError ? (
-            <p className="text-red-500">{errors.apiError}</p>
-          ) : (
-            <>
-              <h3 className="text-xl font-semibold text-gray-800">No predictions found</h3>
-              <p className="text-gray-600">Try adjusting your search criteria.</p>
-            </>
-          )}
+        <div className="mt-8 mb-10 bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
+          <div className="overflow-y-auto max-h-40 p-4">
+            {errors.apiError ? (
+              <p className="text-red-500">{errors.apiError}</p>
+            ) : (
+              <>
+                <h3 className="text-xl font-semibold text-gray-800">No predictions found</h3>
+                <p className="text-gray-600">Try adjusting your search criteria.</p>
+              </>
+            )}
+          </div>
         </div>
       )}
+
     </div>
   );
 };
