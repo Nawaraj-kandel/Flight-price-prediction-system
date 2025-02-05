@@ -10,7 +10,7 @@ import PricePrediction from "./pages/PricePrediction";
 import Booking from "./pages/Booking";
 import Terms from "./components/Terms";
 import Signup from "./pages/Signup";
-// import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "./components/PrivateRoute";
 
 
 function App() {
@@ -24,12 +24,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<Aboutus />} />
-          <Route path="/price" element={<PricePrediction />} />
+          {/* <Route path="/price" element={<PricePrediction />} /> */}
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* <Route path="/price" element={  <PrivateRoute> <PricePrediction /> </PrivateRoute> } /> */}
+          <Route path="/price" element={  <PrivateRoute> <PricePrediction /> </PrivateRoute> } />
        
           <Route path="/booking" element={<Booking />} />
         </Routes>

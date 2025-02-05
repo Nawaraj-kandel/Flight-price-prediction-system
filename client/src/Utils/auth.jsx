@@ -27,9 +27,11 @@
 export const isAuthenticated = () => {
   const authToken = localStorage.getItem("authToken");
   if (!authToken) return false;
+  else return true;
+  
 
-  const parsedToken = JSON.parse(authToken);
-  return parsedToken.expiresAt > Date.now();
+  // const parsedToken = JSON.parse(authToken);
+  // return parsedToken.expiresAt > Date.now();
 };
 export const logout = () => {
   localStorage.removeItem("authToken"); // Clear the token

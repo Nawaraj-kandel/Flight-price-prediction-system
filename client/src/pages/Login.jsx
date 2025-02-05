@@ -31,20 +31,22 @@ const Login = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+      
       if (response.ok) {
         toast.success("Login Successful!");
         localStorage.setItem(
           "authToken",
-          JSON.stringify({ token: data.token, expiresAt: Date.now() + data.expiresIn * 1000 })
+          JSON.stringify({ token: data.token })
+          //, expiresAt: Date.now() + data.expiresIn * 1000
         );
         navigate("/price");
+        window.location.reload();
       } else {
-        toast.error(data.message || "Invalid email or password.");
+        toast.error(data.detail || "Invalid email or password.");
       }
     } catch (error) {
       toast.error("An error occurred. Please try again." + error);

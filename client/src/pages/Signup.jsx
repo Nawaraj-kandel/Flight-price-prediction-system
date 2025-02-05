@@ -12,11 +12,13 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
+  // Handle Input Changes
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
+  // Validate Form Inputs
   const validateForm = () => {
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required.";
@@ -25,25 +27,39 @@ const Signup = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Signup Function
   const signup = async () => {
     if (!validateForm()) return;
+    console.log(formData);
     setLoading(true);
     try {
+      // Register User
       const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
-        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       const data = await response.json();
       if (response.ok) {
-        toast.success("Signup Successful! Please log in.");
-        navigate("/login");
+        // Call the mail verification API
+        const verifyResponse = await fetch(`${API_BASE_URL}/mail/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email }),
+        });
+
+        if (verifyResponse.ok) {
+          toast.success("Signup successful! Check your email for verification.");
+          navigate("/login");
+        } else {
+          toast.error("Signup successful, but email verification failed.");
+        }
       } else {
-        toast.error(data.message || "Signup failed. Please try again.");
+        toast.error(data.detail || "Signup failed. Please try again.");
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again."+error);
+      toast.error("An error occurred. Please try again. " + error);
     } finally {
       setLoading(false);
     }
@@ -84,7 +100,11 @@ const Signup = () => {
           </div>
         </div>
 
-        <button onClick={signup} className="w-full bg-blue-500 text-white p-3 rounded-md mt-6 hover:bg-blue-600" disabled={loading}>
+        <button
+          onClick={signup}
+          className="w-full bg-blue-500 text-white p-3 rounded-md mt-6 hover:bg-blue-600"
+          disabled={loading}
+        >
           {loading ? "Processing..." : "Sign Up"}
         </button>
 

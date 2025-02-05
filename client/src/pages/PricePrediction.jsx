@@ -41,8 +41,10 @@ const PricePrediction = () => {
     } else if (arrivalDate <= departureDate) {
       newErrors.arrival_time = "Arrival time must be after departure time.";
     }
-    if (formData.transit_count === null || formData.transit_count < 0) {
+    if (formData.transit_count === "" || formData.transit_count < 0) {
       newErrors.transit_count = "Transit count is required and must be a non-negative number.";
+    } else if (formData.transit_count > 4) {
+      newErrors.transit_count = "Transit count cannot be greater than 4.";
     }
 
     return newErrors;
@@ -60,6 +62,7 @@ const PricePrediction = () => {
     setErrors({});
     setLoading(true);
     setPredictions([]); // Clear previous predictions
+    
 
     try {
       console.log("Form Data Sent to API:", formData);
@@ -90,8 +93,8 @@ const PricePrediction = () => {
     }
   };
 
-  const origin = ["Banglore", "Delhi", "Kolkata", "Mumbai", "Chennai"];
-  const destination = ["Banglore", "Cochin", "Delhi", "New Delhi", "Hydrabad", "Kolkata"];
+  const origin = ["Chennai", "Delhi", "Kolkata", "Mumbai"];
+  const destination = ["Cochin", "Delhi", "Hyderabad","Kolkata", "New Delhi"];
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
@@ -227,36 +230,39 @@ const PricePrediction = () => {
 
       {/* Predictions */}
       {predictions.length > 0 && (
-        <div className="m-8  bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+        <div className="m-8 bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Predicted Prices</h3>
-          <ul>
-            {predictions.map((prediction, index) => (
-              <li
-                key={index}
-                className="p-4 border-b last:border-b-0 flex items-center justify-between"
-              >
-                {/* Flight Name */}
-                <p className="text-lg font-semibold text-gray-700 flex-1">{prediction.airline}</p>
+          <div className="overflow-y-auto max-h-80">
+            <ul>
+              {predictions.map((prediction, index) => (
+                <li
+                  key={index}
+                  className="p-4 border-b last:border-b-0 flex items-center justify-between"
+                >
+                  {/* Flight Name */}
+                  <p className="text-lg font-semibold text-gray-700 flex-1">{prediction.airline}</p>
 
-                {/* Price */}
-                <p className="text-green-600 font-medium text-lg flex-1 text-center">
-                  Rs. {prediction.predicted_price}
-                </p>
+                  {/* Price */}
+                  <p className="text-green-600 font-medium text-lg flex-1 text-center">
+                    Rs. {prediction.predicted_price}
+                  </p>
 
-                {/* Book Button */}
-                <Link to="/booking" className="flex-1 text-right">
-                  <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
-                    Book
-                  </button>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  {/* Book Button */}
+                  <Link to="/booking" className="flex-1 text-right">
+                    <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+                      Book
+                    </button>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
       {/* No Predictions Message */}
       {!loading && predictions.length === 0 && (
+        window.scrollTo({ top: 0, behavior: "smooth" }),
         <div className="mt-8 mb-10 bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
           <div className="overflow-y-auto max-h-40 p-4">
             {errors.apiError ? (
