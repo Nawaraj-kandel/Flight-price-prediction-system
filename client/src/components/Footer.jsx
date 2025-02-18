@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-blue-600 text-white py-6">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row justify-center items-center space-x-10">
+    <footer className="bg-white text-black py-4 shadow-lg  border-t border-gray-300 ">
+      <div className=" mx-auto px-4 flex flex-col md:flex-row justify-center items-center space-x-10">
         
         {/* Contact Information */}
         <div className="text-center md:text-left mb-4 md:mb-0">
@@ -13,7 +13,7 @@ const Footer = () => {
         </div>
 
         {/* Quick Links */}
-        <div className="flex flex-col space-y-2 px-10 ">
+        <div className="flex flex-col font-semibold space-y-2 px-10 ">
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/about" className="hover:underline">About Us</Link>
           <Link to="/price-view" className="hover:underline">Price View</Link>
@@ -32,3 +32,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
