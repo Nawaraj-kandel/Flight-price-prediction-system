@@ -25,7 +25,7 @@ const VerifyCode = () => {
 
             // Make the POST request with the password field and token as a query parameter
             const response = await axios.post(
-                `${apiBaseUrl}/register/reset-password/?token=${token}`,
+                `${apiBaseUrl}/register/reset-password?token=${token}`,
                 { password },
                 {
                     headers: {
