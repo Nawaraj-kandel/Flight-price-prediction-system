@@ -74,17 +74,18 @@
 // export default ResetPassword;
 
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_BASE_URL } from "../Api/Api";
 
 const ResetPassword = () => {
-  const { token } = useParams();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
