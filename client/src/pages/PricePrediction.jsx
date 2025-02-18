@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../Api/Api";
+import { getAuthToken } from "../Utils/auth";
 
 const PricePrediction = () => {
   const [formData, setFormData] = useState({
@@ -62,14 +63,19 @@ const PricePrediction = () => {
     setErrors({});
     setLoading(true);
     setPredictions([]); // Clear previous predictions
-    
 
     try {
+      const authToken = getAuthToken(); // Get the auth token
+      if (!authToken) {
+        throw new Error("Authorization token is missing");
+      }
+      // console.log("Auth Token:", authToken);
       console.log("Form Data Sent to API:", formData);
       const response = await fetch(`${API_BASE_URL}/flight/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`, // Add the authorization header
         },
         body: JSON.stringify(formData),
       });
@@ -94,7 +100,7 @@ const PricePrediction = () => {
   };
 
   const origin = ["Chennai", "Delhi", "Kolkata", "Mumbai"];
-  const destination = ["Cochin", "Delhi", "Hyderabad","Kolkata", "New Delhi"];
+  const destination = ["Cochin", "Delhi", "Hyderabad", "Kolkata", "New Delhi"];
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-r from-blue-100 to-blue-200">
@@ -108,7 +114,7 @@ const PricePrediction = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label htmlFor="origin" className="block text-sm font-medium text-gray-700 mb-2">
-                Origin
+                Origin*
               </label>
               <select
                 name="origin"
@@ -129,7 +135,7 @@ const PricePrediction = () => {
 
             <div>
               <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-2">
-                Destination
+                Destination*
               </label>
               <select
                 name="destination"
@@ -155,7 +161,7 @@ const PricePrediction = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label htmlFor="departure_time" className="block text-sm font-medium text-gray-700 mb-2">
-                Departure Time
+                Departure Time*
               </label>
               <input
                 type="datetime-local"
@@ -172,7 +178,7 @@ const PricePrediction = () => {
 
             <div>
               <label htmlFor="arrival_time" className="block text-sm font-medium text-gray-700 mb-2">
-                Arrival Time
+                Arrival Time*
               </label>
               <input
                 type="datetime-local"
@@ -191,7 +197,7 @@ const PricePrediction = () => {
           {/* Transit Count */}
           <div className="mb-6">
             <label htmlFor="transit_count" className="block text-sm font-medium text-gray-700 mb-2">
-              Transit Count
+              Transit Count*
             </label>
             <input
               type="number"
@@ -248,7 +254,24 @@ const PricePrediction = () => {
                   </p>
 
                   {/* Book Button */}
-                  <Link to="/booking" className="flex-1 text-right">
+                  {/* <Link to="/booking" className="flex-1 text-right">
+                    <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+                      Book
+                    </button>
+                  </Link> */}
+                  {/* <Link
+                    to={`/booking?airline=${encodeURIComponent(prediction.airline)}&price=${prediction.predicted_price} `}
+                    className="flex-1 text-right"
+                  >
+                    <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
+                      Book
+                    </button>
+                  </Link> */}
+
+                  <Link
+                    to={`/booking?airline=${encodeURIComponent(prediction.airline)}&price=${prediction.predicted_price}&flight_id=${prediction.id}`}
+                    className="flex-1 text-right"
+                  >
                     <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200">
                       Book
                     </button>

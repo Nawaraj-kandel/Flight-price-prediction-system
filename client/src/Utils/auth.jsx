@@ -1,39 +1,22 @@
-// // utils/auth.js
+export const getAuthToken = () => {
+  const tokenData = JSON.parse(localStorage.getItem("authToken"));
+  return tokenData ? tokenData.accessToken : null;
+};
 
-// // Check if the token exists and is valid
-// export const isAuthenticated = () => {
-//   const token = localStorage.getItem("authToken");
-//   if (!token) return false;
-
-//   try {
-//     const { exp } = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
-//     if (Date.now() >= exp * 1000) {
-//       localStorage.removeItem("authToken"); // Remove expired token
-//       return false;
-//     }
-//     return true;
-//   } catch (error) {
-//     console.error("Invalid token:", error);
-//     return false;
-//   }
-// };
-
-// // Log out user
-// export const logout = () => {
-//   localStorage.removeItem("authToken");
-//   window.location.href = "/login";
-// };
+export const getUserInfo = () => {
+  const userInfo = localStorage.getItem("userInfo");
+  return userInfo ? JSON.parse(userInfo) : null;
+};
 
 export const isAuthenticated = () => {
   const authToken = localStorage.getItem("authToken");
   if (!authToken) return false;
-  else return true;
-  
 
-  // const parsedToken = JSON.parse(authToken);
-  // return parsedToken.expiresAt > Date.now();
+  const parsedToken = JSON.parse(authToken);
+  return parsedToken.accessTokenExpiresAt > Date.now();
 };
+
 export const logout = () => {
   localStorage.removeItem("authToken"); // Clear the token
-  window.location.href="/login";
+  window.location.href = "/login";
 };

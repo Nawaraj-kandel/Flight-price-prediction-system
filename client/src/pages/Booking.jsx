@@ -1,69 +1,53 @@
-import { useState, useEffect } from "react";
+import { useState,  } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../Api/Api";
+import { getAuthToken, getUserInfo } from "../Utils/auth";
 
 const Booking = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract flight details from URL and fallback to location.state
+  const searchParams = new URLSearchParams(location.search);
+  const flight_id = searchParams.get("flight_id") || location.state?.flight_id || ""; // Ensures flight_id is retrieved
+  const airline = searchParams.get("airline") || location.state?.airline || "";
+  const price = parseFloat(searchParams.get("price")) || location.state?.price || 0;
+
+  // Fetch user details
+  const userInfo = getUserInfo(); // Should return { user_name, phone_number, email }
+
+  // State management
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    flightNumber: "",
-    date: "",
-    time: "",
+    name: userInfo?.user_name || "",
+    email: userInfo?.email || "",
+    phone: userInfo?.phone_number || "",
+    datetime: "",
+    airline,
+    price,
+    quantity: 1,
+    flight_id, // Include flight_id in formData
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [confirmation, setConfirmation] = useState("");
-  const [minTime, setMinTime] = useState(""); // Tracks the minimum allowed time
-
-  useEffect(() => {
-    if (formData.date) {
-      const today = new Date().toISOString().split("T")[0];
-      if (formData.date === today) {
-        // If today is selected, set min time to the current time
-        const now = new Date();
-        const currentTime = now.toTimeString().slice(0, 5); // Format: HH:MM
-        setMinTime(currentTime);
-      } else {
-        // If a future date is selected, allow any time
-        setMinTime("");
-      }
-    }
-  }, [formData.date]); // Update minTime when the date changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "quantity" ? Math.max(1, parseInt(value, 10) || 1) : value,
+    }));
   };
 
   const validate = () => {
     const newErrors = {};
-    const now = new Date();
-    const selectedDate = new Date(formData.date);
-    const selectedTime = new Date(`${formData.date}T${formData.time}`);
-
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email is invalid";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    if (!/^\d{10}$/.test(formData.phone))
-      newErrors.phone = "Phone number is invalid";
-    if (!formData.flightNumber)
-      newErrors.flightNumber = "Flight number is required";
-    if (!formData.date) newErrors.date = "Date is required";
-
-    // Check if the selected date is in the past
-    if (selectedDate.setHours(0, 0, 0, 0) < now.setHours(0, 0, 0, 0)) {
-      newErrors.date = "Date cannot be in the past";
-    }
-
-    if (!formData.time) newErrors.time = "Time is required";
-
-    // Check if the selected time is in the past (only if today is selected)
-    if (formData.date === now.toISOString().split("T")[0] && selectedTime < now) {
-      newErrors.time = "Time cannot be in the past";
-    }
-
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+    if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "Phone number must be 10 digits";
+    if (!formData.flight_id) newErrors.flight_id = "Flight ID is required"; // Validate flight_id
     return newErrors;
   };
 
@@ -79,75 +63,94 @@ const Booking = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://your-backend-api.com/book", {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        navigate("/login");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/flight/book`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          flight_id: formData.flight_id, // Ensure flight_id is included in the request body
+          phone_number: formData.phone, // Required by backend
+          user_name: formData.name, // Required by backend
+          email: formData.email, // Required by backend
+          quantity: formData.quantity, // Required by backend
+          datetime: formData.datetime, // Required by backend
+          airline: formData.airline, // Additional data
+          price: formData.price, // Additional data
+          created_at: new Date().toISOString(), // Additional data
+          cancelled: false, // Additional data
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to book the flight. Please try again.");
+        const errorData = await response.json();
+        
+        console.error("API Error:", errorData);
+        throw new Error(errorData.detail || "Failed to book the flight.");
       }
-
       const data = await response.json();
-      setConfirmation("Booking successful! Your booking ID is " + data.bookingId);
+      console.log("API Response Data:", data);
+      
+      setConfirmation("Booking successful!");
     } catch (error) {
-      console.error("Error:", error);
-      setConfirmation("An error occurred. Please try again.");
+      console.error("Booking Error:", error);
+      setConfirmation(error.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Get today's date to disable past dates
-  const today = new Date().toISOString().split("T")[0];
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r animate-gradient-x  from-blue-500  via-purple-500  to-pink-500">
-      <div className="w-full max-w-md bg-white p-5 rounded-xl shadow-2xl transition-transform hover:scale-105 duration-300 mt-10 mb-10">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Book Your Flight
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-3">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-5">Book Your Flight</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           {[
             { label: "Name", type: "text", name: "name" },
             { label: "Email", type: "email", name: "email" },
             { label: "Phone Number", type: "text", name: "phone" },
-            { label: "Flight Number", type: "text", name: "flightNumber" },
-            { label: "Date", type: "date", name: "date" },
-            { label: "Time", type: "time", name: "time" },
-          ].map(({ label, type, name }) => (
-            <div key={name} className="mb-2">
-              <label className="block text-base font-medium text-gray-700">
-                {label}
-              </label>
+            { label: "Airline Name", type: "text", name: "airline", disabled: true },
+            { label: "Price per Ticket (Rs)", type: "number", name: "price", disabled: true },
+            { label: "Quantity", type: "number", name: "quantity", min: 1 },
+          ].map(({ label, type, name, disabled, min }) => (
+            <div key={name}>
+              <label className="block text-base font-medium text-gray-700">{label}</label>
               <input
                 type={type}
                 name={name}
                 value={formData[name]}
                 onChange={handleChange}
-                min={name === "date" ? today : name === "time" ? minTime : undefined} // Disable past dates and set min time dynamically
-                disabled={name === "time" && !formData.date} // Disable time input until date is selected
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none focus:border-purple-500 transition-shadow"
+                min={min}
+                disabled={disabled}
+                className="w-full p-2 border border-gray-300 rounded-lg"
               />
-              {errors[name] && (
-                <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-              )}
+              {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
             </div>
           ))}
+
+          <p className="text-lg font-semibold text-center text-gray-700">
+            Total Price: Rs. {formData.price * formData.quantity}
+          </p>
+
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold p-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-md hover:shadow-lg"
+            className={`w-full p-2 rounded-lg font-semibold text-white ${
+              loading ? "bg-gray-400" : "bg-gradient-to-r from-purple-600 to-pink-600"
+            }`}
             disabled={loading}
           >
             {loading ? "Booking..." : "Book Now"}
           </button>
         </form>
-        {confirmation && (
-          <p className="text-green-500 text-center mt-3">{confirmation}</p>
-        )}
+
+        {confirmation && <p className="text-green-500 text-center mt-3">{confirmation}</p>}
       </div>
     </div>
   );
