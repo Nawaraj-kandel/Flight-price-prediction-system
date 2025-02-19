@@ -34,6 +34,7 @@ const Profile = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authToken}`,
         },
+        credentials: 'include', // Include credentials in the request
       });
 
       if (!response.ok) {
@@ -43,7 +44,7 @@ const Profile = () => {
       const data = await response.json();
       console.log("API Data:", data); // Debugging log
 
-      setUserBookings(data);
+      setUserBookings(data.data); // Set user bookings from the response data
     } catch (error) {
       console.error("Error fetching booking history:", error);
       setError(error.message);
@@ -52,9 +53,10 @@ const Profile = () => {
     }
   };
 
-const handleCancelBooking =() => {
-  navigate("/cancel-booking");
+  const handleCancelBooking = () => {
+    navigate("/cancel-booking");
   };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
@@ -71,7 +73,13 @@ const handleCancelBooking =() => {
             <ul className="text-gray-800">
               {userBookings.map((booking, index) => (
                 <li key={index} className="p-2 border-b">
-                  <strong>Flight:</strong> {booking.flight_id} | <strong>Date:</strong> {new Date(booking.created_at).toLocaleString()}
+                  <strong>ID:</strong> {booking._id} | <strong>Flight:</strong> {booking.airline} | <strong>Origin:</strong> {booking.origin} | <strong>Destination:</strong> {booking.destination} | <strong>Departure:</strong> {new Date(booking.departure_time).toLocaleString()} | <strong>Arrival:</strong> {new Date(booking.arrival_time).toLocaleString()} | <strong>Price:</strong> {booking.predicted_price}
+                  <button
+                    onClick={handleCancelBooking}
+                    className="ml-4 p-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
+                  >
+                    Cancel Flight
+                  </button>
                 </li>
               ))}
             </ul>
@@ -79,17 +87,6 @@ const handleCancelBooking =() => {
             <p className="text-gray-500">No bookings found.</p>
           )}
         </div>
-        <div className="mt-4">  
-        <h2 className="text-xl font-semibold mb-2">Cancel Booking:</h2>
-        <p className="text-gray-800">To cancel a booking, click the button below:</p>
-
-        <button
-          onClick={handleCancelBooking}
-          className="mt-4 p-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
-          >
-          Cancel Booking
-        </button>
-          </div>
       </div>
     </div>
   );
