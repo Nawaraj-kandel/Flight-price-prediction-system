@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import CancelBooking from "./Cancel/CancelBooking";
 import VerifyCode from "./pages/VerifyCode";
 
+
 function App() {
   return (
     <Router>
@@ -31,8 +32,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/price" element={<PrivateRoute><PricePrediction /></PrivateRoute>} />
           <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} /> 
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/cancel-booking" element={<PrivateRoute><CancelBooking /></PrivateRoute>} />
           <Route path="/reset-password" element={<VerifyCode />} />

@@ -29,7 +29,7 @@ const Profile = () => {
       }
 
       const response = await fetch(`${API_BASE_URL}/flight/booked/logs`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authToken}`,
