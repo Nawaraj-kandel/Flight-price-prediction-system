@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import CancelBooking from "./Cancel/CancelBooking";
+import VerifyCode from "./pages/VerifyCode";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/reset" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/cancel-booking" element={<PrivateRoute><CancelBooking /></PrivateRoute>} />
+          <Route path="/reset-password" element={<VerifyCode />} />
         </Routes>
       </div>
       <Footer />
