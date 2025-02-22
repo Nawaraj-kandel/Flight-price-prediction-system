@@ -34,7 +34,7 @@ function App() {
           <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} /> 
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={ <PrivateRoute><Profile /> </PrivateRoute> } />
           <Route path="/cancel-booking" element={<PrivateRoute><CancelBooking /></PrivateRoute>} />
           <Route path="/reset-password" element={<VerifyCode />} />
         </Routes>

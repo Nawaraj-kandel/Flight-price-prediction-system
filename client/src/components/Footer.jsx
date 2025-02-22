@@ -16,7 +16,7 @@ const Footer = () => {
         <div className="flex flex-col font-semibold space-y-2 px-10 ">
           <Link to="/" className="hover:underline">Home</Link>
           <Link to="/about" className="hover:underline">About Us</Link>
-          <Link to="/price-view" className="hover:underline">Price View</Link>
+          <Link to="price" className="hover:underline">Price View</Link>
         </div>
         
       </div>

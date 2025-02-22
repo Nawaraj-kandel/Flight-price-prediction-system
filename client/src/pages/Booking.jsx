@@ -1,4 +1,4 @@
-import { useState,  } from "react";
+import { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../Api/Api";
 import { getAuthToken, getUserInfo } from "../Utils/auth";
@@ -24,7 +24,7 @@ const Booking = () => {
     datetime: "",
     airline,
     price,
-    quantity: 1,
+    quantity: "",
     flight_id, // Include flight_id in formData
   });
 
@@ -85,7 +85,6 @@ const Booking = () => {
           airline: formData.airline, // Additional data
           price: formData.price, // Additional data
           created_at: new Date().toISOString(), // Additional data
-          cancelled: false, // Additional data
         }),
       });
 
@@ -106,6 +105,8 @@ const Booking = () => {
       setLoading(false);
     }
   };
+
+  const totalPrice = useMemo(() => formData.price * formData.quantity, [formData.price, formData.quantity]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
@@ -136,7 +137,7 @@ const Booking = () => {
           ))}
 
           <p className="text-lg font-semibold text-center text-gray-700">
-            Total Price: Rs. {formData.price * formData.quantity}
+            Total Price: Rs. {totalPrice}
           </p>
 
           <button
