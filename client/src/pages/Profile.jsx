@@ -120,11 +120,23 @@ const Profile = () => {
                   <th className="py-2 px-4">Arrival</th>
                   <th className="py-2 px-4">Price</th>
                   <th className="py-2 px-4">Status</th>
+                  <th className="py-2 px-4">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {userBookings
-                  .sort((a, b) => new Date(b.flight_details.departure_time) - new Date(a.flight_details.departure_time))
+                  .sort((a, b) => {
+                    const currentTime = new Date();
+                    const aDepartureTime = new Date(a.flight_details.departure_time);
+                    const bDepartureTime = new Date(b.flight_details.departure_time);
+
+                    if (a.cancelled && !b.cancelled) return 1;
+                    if (!a.cancelled && b.cancelled) return -1;
+                    if (a.cancelled && b.cancelled) return bDepartureTime - aDepartureTime;
+                    if (currentTime > aDepartureTime && currentTime < bDepartureTime) return 1;
+                    if (currentTime < aDepartureTime && currentTime > bDepartureTime) return -1;
+                    return bDepartureTime - aDepartureTime;
+                  })
                   .map((booking, index) => {
                     const currentTime = new Date();
                     const departureTime = new Date(booking.flight_details.departure_time);
