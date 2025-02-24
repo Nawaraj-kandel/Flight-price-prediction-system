@@ -1,160 +1,29 @@
-// // import { useState, useEffect } from "react";
-// // import { getAuthToken, getUserInfo } from "../Utils/auth"; // Import getUserInfo
-// // import { API_BASE_URL } from "../Api/Api";
-
-// // const Profile = () => {
-// //   const [userBookings, setUserBookings] = useState([]);
-// //   const [loading, setLoading] = useState(true);
-// //   const [error, setError] = useState(null);
-// //   const [email, setEmail] = useState(""); // Add email state
-
-// //   useEffect(() => {
-// //     const userInfo = getUserInfo(); // Get user information
-// //     setEmail(userInfo.email); // Set email state
-// //     fetchUserBookings();
-// //   }, []);
-
-// //   const fetchUserBookings = async () => {
-// //     setLoading(true);
-// //     setError(null);
-
-// //     try {
-// //       const authToken = getAuthToken();
-// //       console.log("Auth Token:", authToken); // Debugging log
-
-// //       if (!authToken) {
-// //         throw new Error("User not authenticated.");
-// //       }
-
-// //       const response = await fetch(`${API_BASE_URL}/flight/booked/logs`, {
-// //         method: "POST",
-// //         headers: {
-// //           "Content-Type": "application/json",
-// //           "Authorization": `Bearer ${authToken}`,
-// //         },
-// //         credentials: 'include', // Include credentials in the request
-// //       });
-
-// //       console.log("Fetch Response Status:", response.status); // Debugging log
-
-// //       if (!response.ok) {
-// //         throw new Error(`Failed to fetch booking history (Status: ${response.status})`);
-// //       }
-
-// //       const data = await response.json();
-// //       console.log("API Data:", data); // Debugging log
-
-// //       setUserBookings(data.data); // Set user bookings from the response data
-// //     } catch (error) {
-// //       console.error("Error fetching booking history:", error);
-// //       setError(error.message);
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   };
-
-// //   const handleCancelBooking = async (_id) => {
-// //     const confirmCancel = window.confirm("Do you really want to cancel the booking?");
-// //     if (!confirmCancel) {
-// //       return;
-// //     }
-
-// //     try {
-// //       const authToken = getAuthToken();
-// //       console.log("Auth Token:", authToken); // Debugging log
-// //       console.log("Booking ID:", _id); // Debugging log
-
-// //       // Removed invalid URL line
-// //       const response = await fetch(`${API_BASE_URL}/flight/cancel?booking_id=${_id}`, {
-// //         method: "POST",
-// //         headers: {
-// //           "Authorization": `Bearer ${authToken}`,
-// //         },
-// //         credentials: 'include',
-// //       });
-
-// //       console.log("Cancel Response Status:", response.status);
-
-// //       if (!response.ok) {
-// //         const errorData = await response.json();
-// //         console.error("API Error:", errorData); // Debugging log
-// //         throw new Error(errorData?.detail?.[0]?.msg || "Failed to cancel the booking.");
-// //       }
-
-// //       const cancelData = await response.json();
-// //       console.log("Cancellation Response:", cancelData);
-
-// //       // Update the booking list after cancellation
-// //       fetchUserBookings();
-// //     } catch (error) {
-// //       console.error("Error canceling booking:", error);
-// //       setError(error.message || "No booking found. Please check the booking ID and try again.");
-// //     }
-// //   };
-
-// //   return (
-// //     <div className="container mx-auto p-4">
-// //       <h1 className="text-2xl font-bold mb-4">Profile</h1>
-// //       <div className="bg-white shadow-md rounded-lg p-4">
-// //         <h2 className="text-xl font-semibold mb-2">Your Email:</h2>
-// //         <p className="text-gray-800 mb-4">{email}</p> {/* Display email */}
-// //         <h2 className="text-xl font-semibold mb-2">Your Booking History:</h2>
-// //         <div className="border border-gray-300 p-4 h-64 overflow-auto">
-// //           {loading ? (
-// //             <p className="text-gray-800">Loading...</p>
-// //           ) : error ? (
-// //             <p className="text-red-500">Error: {error}</p>
-// //           ) : userBookings.length > 0 ? (
-// //             <ul className="text-gray-800">
-// //               {userBookings.map((booking, index) => (
-// //                 <li key={index} className="p-2 border-b">
-// //                   <strong>ID:</strong> {booking._id} | <strong>Flight:</strong> {booking.airline} | <strong>Origin:</strong> {booking.origin} | <strong>Destination:</strong> {booking.destination} | <strong>Departure:</strong> {new Date(booking.departure_time).toLocaleString()} | <strong>Arrival:</strong> {new Date(booking.arrival_time).toLocaleString()} | <strong>Price:</strong> {booking.predicted_price}
-// //                   <button
-// //                     onClick={() => handleCancelBooking(booking._id)}
-// //                     className="ml-4 p-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
-// //                   >
-// //                     Cancel Flight
-// //                   </button>
-// //                 </li>
-// //               ))}
-// //             </ul>
-// //           ) : (
-// //             <p className="text-gray-500">No bookings found.</p>
-// //           )}
-// //         </div>
-// //       </div>
-// //     </div>
-// //   );
-// // };
-
-// // export default Profile;
 import { useState, useEffect } from "react";
-import { getAuthToken, getUserInfo } from "../Utils/auth"; // Import getUserInfo
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { getAuthToken, getUserInfo } from "../Utils/auth";
 import { API_BASE_URL } from "../Api/Api";
 
 const Profile = () => {
   const [userBookings, setUserBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [email, setEmail] = useState(""); // Email state
+  const [email, setEmail] = useState("");
+  const [selectedBookingId, setSelectedBookingId] = useState(null); // Track selected booking for cancellation
+  const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal visibility
 
   useEffect(() => {
-    const userInfo = getUserInfo(); // Get user information
-    setEmail(userInfo.email); // Set email state
+    const userInfo = getUserInfo();
+    setEmail(userInfo.email);
     fetchUserBookings();
   }, []);
 
   const fetchUserBookings = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const authToken = getAuthToken();
-      console.log("Auth Token:", authToken); // Debugging log
-
-      if (!authToken) {
-        throw new Error("User not authenticated.");
-      }
+      if (!authToken) throw new Error("User not authenticated.");
 
       const response = await fetch(`${API_BASE_URL}/flight/booked/logs`, {
         method: "POST",
@@ -162,76 +31,68 @@ const Profile = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authToken}`,
         },
-        credentials: "include", // Include credentials in the request
+        credentials: "include",
       });
-
-      console.log("Fetch Response Status:", response.status); // Debugging log
 
       if (!response.ok) {
         throw new Error(`Failed to fetch booking history (Status: ${response.status})`);
       }
 
       const data = await response.json();
-      console.log("API Data:", data); // Debugging log
-
-      setUserBookings(data.data); // Set user bookings from the response data
+      setUserBookings(data.data);
     } catch (error) {
-      console.error("Error fetching booking history:", error);
       setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!bookingId) {
-      alert("Error: Booking ID is missing.");
-      console.error(" Missing booking_id, cannot proceed with cancellation.");
+  const confirmCancellation = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setShowConfirmModal(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (!selectedBookingId) {
+      toast.error("Error: Booking ID is missing.");
       return;
     }
 
-    const confirmCancel = window.confirm("Do you really want to cancel the booking?");
-    if (!confirmCancel) return;
-
     try {
       const authToken = getAuthToken();
-      console.log(" Auth Token:", authToken);
-      console.log(" Booking ID to Cancel:", bookingId);
-
-      const requestBody = JSON.stringify({ booking_id: bookingId });
-      console.log(" Request Body:", requestBody);
-
-      const response = await fetch(`${API_BASE_URL}/flight/cancel?booking_id=${bookingId}`, {
+      const response = await fetch(`${API_BASE_URL}/flight/cancel?booking_id=${selectedBookingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authToken}`,
         },
         credentials: "include",
-        body: requestBody, // Ensure this sends correctly
+        body: JSON.stringify({ booking_id: selectedBookingId }),
       });
 
-      console.log(" Cancel Response Status:", response.status);
-
-      const responseText = await response.text(); // Read raw response
-      console.log(" Raw API Response:", responseText);
-
       if (!response.ok) {
+        const responseText = await response.text();
         let errorData;
         try {
           errorData = JSON.parse(responseText);
-          console.error(" API Error (Parsed):", errorData);
         } catch {
-          console.error(" API Error (Raw Text):", responseText);
+          console.error("API Error (Raw Text):", responseText);
         }
-        throw new Error(errorData?.detail?.[0]?.msg || "Failed to cancel the booking.");
-      }
 
-      alert(" Your flight has been successfully canceled.");
-      fetchUserBookings(); // Refresh booking list
+        if (errorData?.detail === "Flight already cancelled") {
+          toast.info("This flight has already been cancelled.");
+        } else {
+          throw new Error(errorData?.detail?.[0]?.msg || "Failed to cancel the booking.");
+        }
+      } else {
+        toast.success("Your flight has been successfully canceled.");
+        fetchUserBookings(); // Refresh booking list
+      }
     } catch (error) {
-      console.error("Error canceling booking:", error);
       setError(error.message || "Something went wrong. Please try again.");
+    } finally {
+      setSelectedBookingId(null);
+      setShowConfirmModal(false); // Close modal
     }
   };
 
@@ -240,46 +101,87 @@ const Profile = () => {
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
       <div className="bg-white shadow-md rounded-lg p-4">
         <h2 className="text-xl font-semibold mb-2">Your Email:</h2>
-        <p className="text-gray-800 mb-4">{email}</p> {/* Display email */}
+        <p className="text-gray-800 mb-4">{email}</p>
         <h2 className="text-xl font-semibold mb-2">Your Booking History:</h2>
-        <div className="border border-gray-300 p-4 h-64 overflow-auto">
+        <div className="border border-gray-300 p-4 h-80 overflow-auto">
           {loading ? (
             <p className="text-gray-800">Loading...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
           ) : userBookings.length > 0 ? (
-            <ul className="text-gray-800">
-              {userBookings
-                .sort((a, b) => new Date(b.departure_time) - new Date(a.departure_time)) // Sort bookings by departure time in descending order
-                .map((booking, index) => {
-                  const currentTime = new Date();
-                  const departureTime = new Date(booking.departure_time);
-                  return (
-                    <li key={index} className="p-2 border-b">
-                      <strong>ID:</strong> {booking._id} |
-                      <strong> Flight:</strong> {booking.airline} |
-                      <strong> Origin:</strong> {booking.origin} |
-                      <strong> Destination:</strong> {booking.destination} |
-                      <strong> Departure:</strong> {departureTime.toLocaleString()} |
-                      <strong> Arrival:</strong> {new Date(booking.arrival_time).toLocaleString()} |
-                      <strong> Price:</strong> {booking.predicted_price}
-                      {currentTime < departureTime && (
-                        <button
-                          onClick={() => handleCancelBooking(booking._id)} // Pass `_id` to function
-                          className="ml-4 p-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
-                        >
-                          Cancel Flight
-                        </button>
-                      )}
-                    </li>
-                  );
-                })}
-            </ul>
+            <table className="min-w-full bg-white table-auto">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4">Booking ID</th>
+                  <th className="py-2 px-4">Flight</th>
+                  <th className="py-2 px-4">Origin</th>
+                  <th className="py-2 px-4">Destination</th>
+                  <th className="py-2 px-4">Departure</th>
+                  <th className="py-2 px-4">Arrival</th>
+                  <th className="py-2 px-4">Price</th>
+                  <th className="py-2 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userBookings
+                  .sort((a, b) => new Date(b.flight_details.departure_time) - new Date(a.flight_details.departure_time))
+                  .map((booking, index) => {
+                    const currentTime = new Date();
+                    const departureTime = new Date(booking.flight_details.departure_time);
+                    return (
+                      <tr key={index} className="border-b">
+                        <td className="py-2 px-4">{booking._id}</td>
+                        <td className="py-2 px-4">{booking.flight_details.airline}</td>
+                        <td className="py-2 px-4">{booking.flight_details.origin}</td>
+                        <td className="py-2 px-4">{booking.flight_details.destination}</td>
+                        <td className="py-2 px-4">{departureTime.toLocaleString()}</td>
+                        <td className="py-2 px-4">{new Date(booking.flight_details.arrival_time).toLocaleString()}</td>
+                        <td className="py-2 px-4">{booking.flight_details.predicted_price}</td>
+                        <td className="py-2 px-4">{booking.cancelled ? <span className="text-red-500">Cancelled</span> : ""}</td>
+                        <td className="py-2 px-6">
+                          {!booking.cancelled && currentTime < departureTime && (
+                            <button
+                              onClick={() => confirmCancellation(booking._id)}
+                              className="p-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600"
+                            >
+                              Cancel Flight
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
           ) : (
             <p className="text-gray-500">No bookings found.</p>
           )}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-lg font-bold">Cancel Booking</h2>
+            <p className="text-gray-600 mt-2">Are you sure you want to cancel this flight?</p>
+            <div className="flex justify-center space-x-4 mt-4">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg"
+              >
+                No, Keep It
+              </button>
+              <button
+                onClick={handleCancelBooking}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

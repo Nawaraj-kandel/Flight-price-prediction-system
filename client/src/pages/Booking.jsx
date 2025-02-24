@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { API_BASE_URL } from "../Api/Api";
 import { getAuthToken, getUserInfo } from "../Utils/auth";
 
@@ -7,16 +9,13 @@ const Booking = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract flight details from URL and fallback to location.state
   const searchParams = new URLSearchParams(location.search);
-  const flight_id = searchParams.get("flight_id") || location.state?.flight_id || ""; // Ensures flight_id is retrieved
+  const flight_id = searchParams.get("flight_id") || location.state?.flight_id || "";
   const airline = searchParams.get("airline") || location.state?.airline || "";
   const price = parseFloat(searchParams.get("price")) || location.state?.price || 0;
 
-  // Fetch user details
-  const userInfo = getUserInfo(); // Should return { user_name, phone_number, email }
+  const userInfo = getUserInfo();
 
-  // State management
   const [formData, setFormData] = useState({
     name: userInfo?.user_name || "",
     email: userInfo?.email || "",
@@ -25,12 +24,11 @@ const Booking = () => {
     airline,
     price,
     quantity: "",
-    flight_id, // Include flight_id in formData
+    flight_id,
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [confirmation, setConfirmation] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +45,7 @@ const Booking = () => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
     if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
     if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "Phone number must be 10 digits";
-    if (!formData.flight_id) newErrors.flight_id = "Flight ID is required"; // Validate flight_id
+    if (!formData.flight_id) newErrors.flight_id = "Flight ID is required";
     return newErrors;
   };
 
@@ -76,31 +74,34 @@ const Booking = () => {
           Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          flight_id: formData.flight_id, // Ensure flight_id is included in the request body
-          phone_number: formData.phone, // Required by backend
-          user_name: formData.name, // Required by backend
-          email: formData.email, // Required by backend
-          quantity: formData.quantity, // Required by backend
-          datetime: formData.datetime, // Required by backend
-          airline: formData.airline, // Additional data
-          price: formData.price, // Additional data
-          created_at: new Date().toISOString(), // Additional data
+          flight_id: formData.flight_id,
+          phone_number: formData.phone,
+          user_name: formData.name,
+          email: formData.email,
+          quantity: formData.quantity,
+          datetime: formData.datetime,
+          airline: formData.airline,
+          price: formData.price,
+          created_at: new Date().toISOString(),
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        
         console.error("API Error:", errorData);
         throw new Error(errorData.detail || "Failed to book the flight.");
       }
+
       const data = await response.json();
       console.log("API Response Data:", data);
-      
-      setConfirmation("Booking successful!");
+
+      toast.success("Booking successful!", { position: "top-right", autoClose: 3000 });
+      setTimeout(() => {
+        navigate("/profile");
+      }, 3500);
     } catch (error) {
       console.error("Booking Error:", error);
-      setConfirmation(error.message || "An error occurred. Please try again.");
+      toast.error(error.message || "An error occurred. Please try again.", { position: "top-right", autoClose: 3000 });
     } finally {
       setLoading(false);
     }
@@ -131,7 +132,7 @@ const Booking = () => {
                 min={min}
                 disabled={disabled}
                 className="w-full p-2 border border-gray-300 rounded-lg"
-              />
+              />  
               {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
             </div>
           ))}
@@ -150,8 +151,6 @@ const Booking = () => {
             {loading ? "Booking..." : "Book Now"}
           </button>
         </form>
-
-        {confirmation && <p className="text-green-500 text-center mt-3">{confirmation}</p>}
       </div>
     </div>
   );
