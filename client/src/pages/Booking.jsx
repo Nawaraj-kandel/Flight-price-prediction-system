@@ -111,7 +111,7 @@ const Booking = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
-      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg m-4">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-5">Book Your Flight</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {[

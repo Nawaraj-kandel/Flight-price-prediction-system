@@ -31,7 +31,7 @@ const Profile = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${authToken}`,
         },
-        credentials: "include",
+        // credentials: "include",
       });
 
       if (!response.ok) {
@@ -126,15 +126,11 @@ const Profile = () => {
               <tbody>
                 {userBookings
                   .sort((a, b) => {
-                    const currentTime = new Date();
                     const aDepartureTime = new Date(a.flight_details.departure_time);
                     const bDepartureTime = new Date(b.flight_details.departure_time);
 
-                    if (a.cancelled && !b.cancelled) return 1;
                     if (!a.cancelled && b.cancelled) return -1;
-                    if (a.cancelled && b.cancelled) return bDepartureTime - aDepartureTime;
-                    if (currentTime > aDepartureTime && currentTime < bDepartureTime) return 1;
-                    if (currentTime < aDepartureTime && currentTime > bDepartureTime) return -1;
+                    if (a.cancelled && !b.cancelled) return 1;
                     return bDepartureTime - aDepartureTime;
                   })
                   .map((booking, index) => {

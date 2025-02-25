@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-
 const Home = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-6">
+      <section className="flex flex-col items-center justify-center text-center mt-20 py-20 px-6">
         <h1 className="text-5xl font-extrabold text-gray-900 leading-tight">
            Flight Price Prediction System
         </h1>

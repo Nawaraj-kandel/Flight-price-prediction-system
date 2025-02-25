@@ -14,8 +14,6 @@ import PrivateRoute from "./components/PrivateRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
-// import CancelBooking from "./Cancel/CancelBooking";
-import VerifyCode from "./pages/VerifyCode";
 
 
 function App() {
@@ -35,8 +33,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} /> 
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={ <PrivateRoute><Profile /> </PrivateRoute> } />
-          {/* <Route path="/cancel-booking" element={<PrivateRoute><CancelBooking /></PrivateRoute>} /> */}
-          <Route path="/reset-password" element={<VerifyCode />} />
+          
         </Routes>
       </div>
       <Footer />
