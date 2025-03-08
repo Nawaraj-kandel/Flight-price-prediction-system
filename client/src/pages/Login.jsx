@@ -40,7 +40,7 @@ const Login = () => {
         localStorage.setItem("authToken", JSON.stringify({
           accessToken: data.access_token,
           refreshToken: data.refresh_token,
-          accessTokenExpiresAt: Date.now() + (15 * 60 * 1000), // 15 minutes
+          accessTokenExpiresAt: Date.now() + (24* 60 * 60 * 1000), 
           refreshTokenExpiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 days
         }));
         localStorage.setItem("userInfo", JSON.stringify({
@@ -78,7 +78,7 @@ const Login = () => {
         localStorage.setItem("authToken", JSON.stringify({
           accessToken: data.access_token,
           refreshToken: authToken.refreshToken,
-          accessTokenExpiresAt: Date.now() + (15 * 60 * 1000), // 15 minutes
+          accessTokenExpiresAt: Date.now() + (24* 60 * 60 * 1000),
           refreshTokenExpiresAt: authToken.refreshTokenExpiresAt
         }));
         console.log("Token refreshed successfully"); // Debugging log
