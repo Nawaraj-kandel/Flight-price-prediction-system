@@ -343,7 +343,7 @@ const Profile = () => {
                         <td className="py-2 px-4">{booking.flight_details.destination}</td>
                         <td className="py-2 px-4">{departureTime.toLocaleString()}</td>
                         <td className="py-2 px-4">{new Date(booking.flight_details.arrival_time).toLocaleString()}</td>
-                        <td className="py-2 px-4">{booking.flight_details.predicted_price}</td>
+                        <td className="py-2 px-4">{booking.total_price}</td>
                         <td className="py-2 px-4">{booking.cancelled ? <span className="text-red-500">Cancelled</span> : ""}</td>
                         <td className="py-2 px-6">
                           {!booking.cancelled && currentTime < departureTime && (
